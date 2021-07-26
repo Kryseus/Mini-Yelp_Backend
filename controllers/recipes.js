@@ -31,7 +31,7 @@ export const createRecipe = (req, res) => {
     };
     recipes.push(newRecipe);
     res.json(newRecipe);
-    };
+};
 
 export const updateRecipe = (req, res) => {
     const { input } = req.params;
@@ -45,4 +45,13 @@ export const updateRecipe = (req, res) => {
     recipe.Instructions = Instructions
     recipe.Datum = Datum
     res.status(200).json(recipe);
+};
+
+export const deleteRecipe = (req, res) => {
+    const { input } = req.params;
+    const recipe = checkIfRecipeInArray(input);
+    if(!recipe) return res.status(404).json({error: 'Recipe does not exist in your list'});
+    const index = recipes.indexOf(recipe);
+    recipes.slice(index, 1);
+    res.status(200).json({success: 'Recipe removed'});
 };
