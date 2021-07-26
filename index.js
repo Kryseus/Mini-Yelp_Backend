@@ -5,4 +5,4 @@ const port = process.env.PORT || 5000;
 
 app.get("/", (req, res) => res.send("Hello World"));
 
-app.listen(port, () => console.log(`Servers listening at http://localihost:${port}`));
+app.listen(port, () => console.log(`Servers listening at http://localhost:${port}`));
