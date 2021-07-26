@@ -15,7 +15,6 @@ export const getSingleRecipe = (req, res) => {
     res.status(200).json(recipe);
 };
 
-
 export const createRecipe = (req, res) => {
     const { name, Description, Ingredients, Photo, Instructions, Datum} = req.body;
 
@@ -34,3 +33,16 @@ export const createRecipe = (req, res) => {
     res.json(newRecipe);
     };
 
+export const updateRecipe = (req, res) => {
+    const { input } = req.params;
+    const { name, Description, Ingredients, Photo, Instructions, Datum } = req.body;
+     const recipe = checkIfRecipeInArray(input);
+    if(!recipe) return res.status(404).json({error: 'Recipe does not exist in your list'});
+    recipe.name = name
+    recipe.Description = Description
+    recipe.Ingredients = Ingredients
+    recipe.Photo = Photo
+    recipe.Instructions = Instructions
+    recipe.Datum = Datum
+    res.status(200).json(recipe);
+};
