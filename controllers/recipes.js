@@ -8,6 +8,14 @@ i => i.name === input || i.Description === input || i.Ingredients === input || i
 
 export const getAllRecipes = (req, res) => res.json(recipes);
 
+export const getSingleRecipe = (req, res) => {
+    const { input } = req.params;
+    const recipe = checkIfRecipeInArray(input);
+    if(!recipe) return res.status(404).json({error: 'Recipe does not exist in your list'});
+    res.status(200).json(recipe);
+};
+
+
 export const createRecipe = (req, res) => {
     const { name, Description, Ingredients, Photo, Instructions, Datum} = req.body;
 
@@ -16,7 +24,7 @@ export const createRecipe = (req, res) => {
         checkIfRecipeInArray(Datum)];
         console.log(alreadyExists);
 
-        if (alreadyExists.some(input => input)) return res.status(403).json({ error: 'Country already exists' });
+        if (alreadyExists.some(input => input)) return res.status(403).json({ error: 'Recipe already exists' });
 
     const newRecipe = {
         id: recipes.length + 1,
@@ -25,3 +33,4 @@ export const createRecipe = (req, res) => {
     recipes.push(newRecipe);
     res.json(newRecipe);
     };
+
