@@ -57,16 +57,6 @@ export const updateRecipe = async (req, res) => {
     }
   };
 
-export const deleteRecipe = (req, res) => {
-    const { input } = req.params;
-    const recipe = checkIfRecipeInArray(input);
-    if(!recipe) return res.status(404).json({error: 'Recipe does not exist in your list'});
-    const index = recipes.indexOf(recipe);
-    recipes.slice(index, 1);
-    res.status(200).json({success: 'Recipe removed'});
-};
-
-
 export const deleteRecipe = async (req, res) => {
     try {
       const { id } = req.params;
