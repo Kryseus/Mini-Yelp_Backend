@@ -1,51 +1,61 @@
-import recipes from '../data/recipes.js';
+import pool from '../db/pg.js';
 
-const checkIfRecipeInArray = input => {
-    if (!input) return null;
-    return recipes.find(
-i => i.name === input || i.Description === input || i.Ingredients === input || i.Photo === input || i.Instructions === input || i.Datum === input);
-};
+export const getAllRecipes = async (req, res) => {
+    try {
+      const { rowCount: total, rows: posts } = await pool.query('SELECT * FROM recipes;');
+      res.status(200).json({ total, posts });
+    } catch ({ message }) {
+      res.status(500).json({ error: message });
+    }
+  };
 
-export const getAllRecipes = (req, res) => res.json(recipes);
+  export const getSingleRecipe = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { rows, rowCount } = await pool.query('SELECT * FROM recipes WHERE id=$1;', [id]);
+      if (!rowCount) throw new Error(`Post with id of ${id} doesn't exist`);
+      res.status(200).json(rows[0]);
+    } catch ({ message }) {
+      res.status(500).json({ error: message });
+    }
+  };
 
-export const getSingleRecipe = (req, res) => {
-    const { input } = req.params;
-    const recipe = checkIfRecipeInArray(input);
-    if(!recipe) return res.status(404).json({error: 'Recipe does not exist in your list'});
-    res.status(200).json(recipe);
-};
+  export const createRecipe = async (req, res) => {
+    try {
+      const { name, description } = req.body;
+      if (!name || !description)
+        throw Error('All fields are required');
+      const { rowCount: found } = await pool.query('SELECT * FROM recipes WHERE name=$1', [name]);
+      if (found) throw Error('Recipe already exists');
+      const values = [name, description];
+      const { rows } = await pool.query(
+        'INSERT INTO recipes(name, description) VALUES($1, $2) RETURNING *',
+        values
+      );
+      res.status(201).json(rows[0]);
+    } catch ({ message }) {
+      res.status(500).json({ error: message });
+    }
+  };
 
-export const createRecipe = (req, res) => {
-    const { name, Description, Ingredients, Photo, Instructions, Datum} = req.body;
-
-    const alreadyExists = [ checkIfRecipeInArray(name), checkIfRecipeInArray(Description), 
-        checkIfRecipeInArray(Ingredients), checkIfRecipeInArray(Photo), checkIfRecipeInArray(Instructions),
-        checkIfRecipeInArray(Datum)];
-        console.log(alreadyExists);
-
-        if (alreadyExists.some(input => input)) return res.status(403).json({ error: 'Recipe already exists' });
-
-    const newRecipe = {
-        id: recipes.length + 1,
-        ...req.body
-    };
-    recipes.push(newRecipe);
-    res.json(newRecipe);
-};
-
-export const updateRecipe = (req, res) => {
-    const { input } = req.params;
-    const { name, Description, Ingredients, Photo, Instructions, Datum } = req.body;
-     const recipe = checkIfRecipeInArray(input);
-    if(!recipe) return res.status(404).json({error: 'Recipe does not exist in your list'});
-    recipe.name = name
-    recipe.Description = Description
-    recipe.Ingredients = Ingredients
-    recipe.Photo = Photo
-    recipe.Instructions = Instructions
-    recipe.Datum = Datum
-    res.status(200).json(recipe);
-};
+export const updateRecipe = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { rowCount: found } = await pool.query('SELECT * FROM recipes WHERE id=$1', [id]);
+      if (!found) throw new Error(`Post with id of ${id} doesn't exist`);
+      const { name, description } = req.body;
+      if (!name || !description)
+        throw Error('All fields are required');
+      const values = [name, description, id];
+      const { rows } = await pool.query(
+        'UPDATE recipes SET name=$1, description=$2, WHERE id=$3 RETURNING *',
+        values
+      );
+      res.status(200).json(rows[0]);
+    } catch ({ message }) {
+      res.status(500).json({ error: message });
+    }
+  };
 
 export const deleteRecipe = (req, res) => {
     const { input } = req.params;
@@ -55,3 +65,19 @@ export const deleteRecipe = (req, res) => {
     recipes.slice(index, 1);
     res.status(200).json({success: 'Recipe removed'});
 };
+
+
+export const deleteRecipe = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { rowCount: found } = await pool.query('SELECT * FROM recipes WHERE id=$1', [id]);
+      if (!found) throw new Error(`Post with id of ${id} doesn't exist`);
+      const { rowCount: deleted } = await pool.query('DELETE FROM recipes WHERE id=$1 RETURNING *', [
+        id
+      ]);
+      if (deleted)
+        res.status(200).json({ success: true, message: `Post with id of ${id} was deleted` });
+    } catch ({ message }) {
+      res.status(500).json({ error: message });
+    }
+  };

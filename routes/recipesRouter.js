@@ -1,8 +1,8 @@
-import express from 'express'
+import { Router } from 'express';
 import { createRecipe, getAllRecipes, getSingleRecipe, updateRecipe, deleteRecipe } from '../controllers/recipes.js';
 
 
-const recipeRouter = express.Router();
+const recipeRouter = Router();
 
 recipeRouter.get('/', getAllRecipes);
 recipeRouter.get('/:input', getSingleRecipe);
