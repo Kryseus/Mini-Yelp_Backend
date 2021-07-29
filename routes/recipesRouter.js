@@ -5,9 +5,9 @@ import { createRecipe, getAllRecipes, getSingleRecipe, updateRecipe, deleteRecip
 const recipeRouter = Router();
 
 recipeRouter.get('/', getAllRecipes);
-recipeRouter.get('/:input', getSingleRecipe);
+recipeRouter.get('/:id', getSingleRecipe);
 recipeRouter.post('/', createRecipe);
-recipeRouter.put('/:input', updateRecipe);
-recipeRouter.delete('/:input', deleteRecipe);
+recipeRouter.put('/:id', updateRecipe);
+recipeRouter.delete('/:id', deleteRecipe);
 
 export default recipeRouter;
