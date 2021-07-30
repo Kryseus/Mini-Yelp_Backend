@@ -2,8 +2,8 @@ import pool from '../db/pg.js';
 
 export const getAllRecipes = async (req, res) => {
     try {
-      const { rowCount: total, rows: posts } = await pool.query('SELECT * FROM recipes;');
-      res.status(200).json({ total, posts });
+      const { rowCount: total, rows: recipes } = await pool.query('SELECT * FROM recipes;');
+      res.status(200).json({ total, recipes });
     } catch ({ message }) {
       res.status(500).json({ error: message });
     }

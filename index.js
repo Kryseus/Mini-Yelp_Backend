@@ -1,10 +1,13 @@
 import 'dotenv/config.js';
 import express from 'express';
+import cors from 'cors';
 import morgan from 'morgan';
 import recipeRouter from './routes/recipesRouter.js';
 
 const app = express();
 const port = process.env.PORT || 5000;
+
+app.use(cors({origin:'*'}));
 
 app.use(morgan('dev'));
 app.use(express.json());
